@@ -15,9 +15,8 @@ const dashboardRoutes = require('./src/routes/dashboard');
 
 const app = express();
 
-const isProd = process.env.NODE_ENV === 'production';
 app.use(cors({
-  origin: isProd ? process.env.FRONTEND_URL : (process.env.FRONTEND_URL || 'http://localhost:5173'),
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
 }));
 
@@ -32,15 +31,6 @@ app.use('/api/users',     userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
-
-// Production: React build'ini servis et
-if (isProd) {
-  const publicPath = path.join(__dirname, 'public');
-  app.use(express.static(publicPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(publicPath, 'index.html'));
-  });
-}
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
